@@ -32,7 +32,7 @@ class Hero(pygame.sprite.Sprite):
     def level_up(self):
         self.level = self.level +1
     #end procedure
-    
+#end class
 class Monster(pygame.sprite.Sprite):
     def __init__(self,hp,atk,s_width,s_length):
         super().__init__()
