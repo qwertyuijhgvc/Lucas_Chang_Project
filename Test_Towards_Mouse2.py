@@ -20,7 +20,6 @@ sprite_image = pygame.image.load('test_sprite.png')
 sprite_rect = sprite_image.get_rect()
 sprite_position = sprite_rect.center
 projectile_image = pygame.image.load('test_projectile.png')
-hero_image = pygame.image.load('test_hero_sprite.png')
 #Create Classes
 class Projectile:
     def __init__(self, position, angle):
@@ -50,8 +49,6 @@ class Hero(pygame.sprite.Sprite):
 #all sprites list
 all_sprites_list = pygame.sprite.Group()
 #Create Hero
-knight_1 = Hero(sprite_position)
-all_sprites_list.add(knight_1)
 # Main game loop
 running = True
 projectiles = []
