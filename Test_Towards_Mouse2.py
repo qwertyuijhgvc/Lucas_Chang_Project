@@ -39,8 +39,6 @@ class Hero(pygame.sprite.Sprite):
         self.level = 1
         self.hp = 10 * self.level
         self.atk = 5 * self.level
-        self.image = hero_image
-        self.rect = self.image.get_rect(center=position)
     #end constructor
     def level_up(self):
         self.level = self.level +1
