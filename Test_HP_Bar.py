@@ -46,7 +46,7 @@ keys = pygame.key.get_pressed()
 #Create new HP BAR
 def HP_FUll():
     for i in range(HP):
-        Bar = HP_BAR(0+i*10, 100)
+        Bar = HP_BAR(i*10, 100)
         all_sprites_list.add(Bar)
     #next i
 #end procedure

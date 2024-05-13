@@ -15,11 +15,14 @@ BLUE = (0, 0, 255)
 PINK = (255, 51, 255)
 ORANGE = (255, 128, 0)
 RED = (255, 0, 0)
+#set positions
+middle_left = (100,300)
 # Load sprites
 sprite_image = pygame.image.load('test_sprite.png')
 sprite_rect = sprite_image.get_rect()
 sprite_position = sprite_rect.center
 projectile_image = pygame.image.load('test_projectile.png')
+hero_image = pygame.image.load("CollisionTesterJerry.png")
 #Create Classes
 class Projectile:
     def __init__(self, position, angle):
@@ -34,19 +37,28 @@ class Projectile:
     #end procedure
 #end class
 class Hero(pygame.sprite.Sprite):
-    def __init__(self, position):
+    def __init__(self, ):
         super().__init__()
+        self.image = hero_image
         self.level = 1
         self.hp = 10 * self.level
         self.atk = 5 * self.level
+        self.rect = self.image.get_rect()
+        self.rect.x = 300
+        self.rect.y = 300
     #end constructor
     def level_up(self):
         self.level = self.level +1
     #end procedure
 #end class
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self, position):
+        self.image = sprite_image
 #all sprites list
 all_sprites_list = pygame.sprite.Group()
 #Create Hero
+Jerry = Hero()
+all_sprites_list.add(Jerry)
 # Main game loop
 running = True
 projectiles = []
@@ -74,7 +86,7 @@ while running:
     # Clear screen
     screen.fill(WHITE)
     # Draw rotated sprite
-    screen.blit(rotated_sprite, rotated_rect.topleft)
+    screen.blit(rotated_sprite, rotated_rect)
     # Update and draw projectiles
     for projectile in projectiles:
         projectile.update()
