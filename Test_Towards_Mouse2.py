@@ -23,9 +23,18 @@ sprite_rect = sprite_image.get_rect()
 sprite_position = sprite_rect.center
 projectile_image = pygame.image.load('test_projectile.png')
 hero_image = pygame.image.load("CollisionTesterJerry.png")
+#Variables
+hit = 0
+intro_font = pygame.font.SysFont("Arial", 20)
+text_font = pygame.font.SysFont("Arial", 10)
+finish_font = pygame.font.SysFont("Arial", 100)
+def draw_text(text, font, text_col, x, y):
+    img = font.render(text, True, text_col)
+    screen.blit(img,(x,y))
 #Create Classes
-class Projectile:
+class Projectile(pygame.sprite.Sprite):
     def __init__(self, position, angle):
+        super().__init__()
         self.image = projectile_image
         self.rect = self.image.get_rect(center=position)
         self.speed = 5
@@ -61,7 +70,7 @@ Jerry = Hero()
 all_sprites_list.add(Jerry)
 # Main game loop
 running = True
-projectiles = []
+projectiles = pygame.sprite.Group()
 while running:
     # Handle events
     for event in pygame.event.get():
@@ -72,8 +81,14 @@ while running:
             mouse_x, mouse_y = pygame.mouse.get_pos()
             angle = math.atan2(mouse_y - sprite_position[1], mouse_x - sprite_position[0])
             angle = math.degrees(angle)
-            projectiles.append(Projectile(sprite_position, angle))
+            projectile = Projectile(sprite_position, angle)
+            projectiles.add(projectile)
         #end if
+        for projectile in projectiles:
+            projectile_hit_list = pygame.sprite.spritecollide(projectile, all_sprites_list, False)
+            for projectile in projectile_hit_list:
+                projectiles.remove(projectile)
+                hit += 1
     # Get mouse position
     mouse_x, mouse_y = pygame.mouse.get_pos()
 
@@ -94,6 +109,7 @@ while running:
     #next projectile
     #draw sprites
     all_sprites_list.draw(screen)
+    draw_text(str(hit), text_font, BLACK, 650, 475)
     # Update display
     pygame.display.flip()
     # Cap the frame rate
