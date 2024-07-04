@@ -21,8 +21,8 @@ middle_left = (100,300)
 sprite_image = pygame.image.load('test_sprite.png')
 sprite_rect = sprite_image.get_rect()
 sprite_position = sprite_rect.center
-projectile_image = pygame.image.load('test_projectile.png')
-hero_image = pygame.image.load("CollisionTesterJerry.png")
+projectile_image = pygame.image.load('test_projectile.png').convert()
+hero_image = pygame.image.load("CollisionTesterJerry.png").convert()
 #Variables
 hit = 0
 intro_font = pygame.font.SysFont("Arial", 20)
@@ -55,6 +55,7 @@ class Hero(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = 300
         self.rect.y = 300
+        self.shield_HP = 5
     #end constructor
     def level_up(self):
         self.level = self.level +1
@@ -86,7 +87,7 @@ while running:
         #end if
         for projectile in projectiles:
             projectile_hit_list = pygame.sprite.spritecollide(projectile, all_sprites_list, False)
-            for projectile in projectile_hit_list:
+            for _ in projectile_hit_list:
                 projectiles.remove(projectile)
                 hit += 1
     # Get mouse position
