@@ -24,7 +24,7 @@ class HP_BAR(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x_cord
         self.rect.y = y_cord
-HP = 100
+HP = 70
 # Create new HP BAR
 def HP_Full():
     for i in range(HP):
