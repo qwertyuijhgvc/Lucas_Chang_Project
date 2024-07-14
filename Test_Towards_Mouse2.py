@@ -1,8 +1,10 @@
 import pygame
 import math
 
+from HP_BAR_Working import HP_BAR, HP_Full
 # Initialize Pygame
 pygame.init()
+hp_bar = HP_BAR(10,100)
 
 # Set up display
 screen = pygame.display.set_mode((800, 600))
@@ -44,6 +46,12 @@ class Projectile(pygame.sprite.Sprite):
         self.rect.x += self.speed * math.cos(math.radians(self.angle))
         self.rect.y += self.speed * math.sin(math.radians(self.angle))
     #end procedure
+    def get_rect_width(self):
+        return self.rect.x
+    #end function
+    def get_rect_height(self):
+        return self.rect.y
+    #end function
 #end class
 class Hero(pygame.sprite.Sprite):
     def __init__(self, ):
@@ -56,9 +64,18 @@ class Hero(pygame.sprite.Sprite):
         self.rect.x = 300
         self.rect.y = 300
         self.shield_HP = 5
+        self.projectile_cooldown = 1
     #end constructor
     def level_up(self):
         self.level = self.level +1
+    def get_cooldown(self):
+        return self.projectile_cooldown
+    def set_cooldown(self,cooldown):
+        self.projectile_cooldown = cooldown
+    def get_hp(self):
+        return self.hp
+    def set_hp(self, HP):
+        self.hp = HP
     #end procedure
 #end class
 class Enemy(pygame.sprite.Sprite):
@@ -66,9 +83,12 @@ class Enemy(pygame.sprite.Sprite):
         self.image = sprite_image
 #all sprites list
 all_sprites_list = pygame.sprite.Group()
+HP_Bar_list = pygame.sprite.Group()
 #Create Hero
 Jerry = Hero()
 all_sprites_list.add(Jerry)
+#create HP bar
+HP_Full(Jerry.get_hp(),HP_Bar_list)
 # Main game loop
 running = True
 projectiles = pygame.sprite.Group()
@@ -79,18 +99,27 @@ while running:
             running = False
         #end if
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
-            mouse_x, mouse_y = pygame.mouse.get_pos()
-            angle = math.atan2(mouse_y - sprite_position[1], mouse_x - sprite_position[0])
-            angle = math.degrees(angle)
-            projectile = Projectile(sprite_position, angle)
-            projectiles.add(projectile)
+            cooldown = Jerry.get_cooldown()
+            if cooldown > 1:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                angle = math.atan2(mouse_y - sprite_position[1], mouse_x - sprite_position[0])
+                angle = math.degrees(angle)
+                projectile = Projectile(sprite_position, angle)
+                projectiles.add(projectile)
+                Jerry.set_cooldown(0)
         #end if
-        for projectile in projectiles:
-            projectile_hit_list = pygame.sprite.spritecollide(projectile, all_sprites_list, False)
-            for _ in projectile_hit_list:
-                projectiles.remove(projectile)
-                hit += 1
-    # Get mouse position
+    for projectile in projectiles:
+        projectile_hit_list = pygame.sprite.spritecollide(projectile, all_sprites_list, False)
+        for _ in projectile_hit_list:
+            projectiles.remove(projectile)
+            hit += 1
+            Jerry.set_hp(Jerry.get_hp()-1)
+        if projectile.get_rect_width() > 800 or projectile.get_rect_height() > 600 or projectile.get_rect_width() < 0 or projectile.get_rect_height() < 0:
+            projectiles.remove(projectile)
+    for sprite in HP_Bar_list:
+            sprite.kill()
+        #next sprite
+    HP_Full(Jerry.get_hp(), HP_Bar_list)
     mouse_x, mouse_y = pygame.mouse.get_pos()
 
     # Calculate angle between sprite and mouse
@@ -110,11 +139,17 @@ while running:
     #next projectile
     #draw sprites
     all_sprites_list.draw(screen)
+    HP_Bar_list.draw(screen)
     draw_text(str(hit), text_font, BLACK, 650, 475)
+    draw_text(str(Jerry.get_cooldown()), text_font, BLACK, 650, 275)
+    draw_text(str(Jerry.get_hp()), text_font, BLACK, 650, 75)
     # Update display
     pygame.display.flip()
     # Cap the frame rate
     pygame.time.Clock().tick(60)
+    
+    #increase cooldown value
+    Jerry.set_cooldown(Jerry.get_cooldown()+1)
 
 # Quit Pygame
 pygame.quit()
