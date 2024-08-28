@@ -20,11 +20,11 @@ RED = (255, 0, 0)
 #set positions
 middle_left = (100,300)
 # Load sprites
-sprite_image = pygame.image.load('test_sprite.png')
+sprite_image = pygame.image.load('resources/test_sprite.png')
 sprite_rect = sprite_image.get_rect()
 sprite_position = sprite_rect.center
-projectile_image = pygame.image.load('test_projectile.png').convert()
-hero_image = pygame.image.load("CollisionTesterJerry.png").convert()
+projectile_image = pygame.image.load('resources/test_projectile.png').convert()
+hero_image = pygame.image.load("resources/CollisionTesterJerry.png").convert()
 #Variables
 hit = 0
 intro_font = pygame.font.SysFont("Arial", 20)
