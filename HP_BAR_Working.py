@@ -28,7 +28,7 @@ class HP_BAR(pygame.sprite.Sprite):
 # Create new HP BAR
 def HP_Full(HP, bar_list):
     for i in range(HP):
-        Bar = HP_BAR(i * 10, 100)
+        Bar = HP_BAR(i * 10, 500)
         bar_list.add(Bar)
 
 # Main Program Loop
