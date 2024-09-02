@@ -291,6 +291,12 @@ while running:
         sprite_position = (sprite_position[0], sprite_position[1] - 5)
     elif keys[pygame.K_s]:
         sprite_position = (sprite_position[0], sprite_position[1] + 5)
+    #Sprite change test
+    elif keys[pygame.K_q]:
+        sprite_image = pygame.image.load('resources/CollisionTesterJerry.png')
+        sprite_rect = sprite_image.get_rect()
+        sprite_position = sprite_rect.center
+    #end if
     angle = math.atan2(mouse_y - sprite_position[1], mouse_x - sprite_position[0])
     angle = math.degrees(angle)
     rotated_sprite = pygame.transform.rotate(sprite_image, -angle)
