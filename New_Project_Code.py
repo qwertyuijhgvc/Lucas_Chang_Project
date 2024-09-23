@@ -10,7 +10,7 @@ hp_bar = HP_BAR(10, 100)
 
 # Set up display
 screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Rotate Sprite towards Mouse")
+pygame.display.set_caption("GAME")
 
 # Set colours
 BLACK = (0, 0, 0)
@@ -38,6 +38,7 @@ enemy_hero_image = pygame.image.load("resources/CollisionTesterJerry.png").conve
 rescale_size = (100,100)
 enemy_hero_image = pygame.transform.scale(enemy_hero_image, rescale_size)
 #Variables
+pause = False
 #test variables
 hit = 0
 dodge_times = 0
@@ -285,14 +286,14 @@ while running:
     # Calculate angle between sprite and mouse
     if keys[pygame.K_a]:
         sprite_position = (sprite_position[0] - 5, sprite_position[1])
-    elif keys[pygame.K_d]:
+    if keys[pygame.K_d]:
         sprite_position = (sprite_position[0] + 5, sprite_position[1])
-    elif keys[pygame.K_w]:
+    if keys[pygame.K_w]:
         sprite_position = (sprite_position[0], sprite_position[1] - 5)
-    elif keys[pygame.K_s]:
+    if keys[pygame.K_s]:
         sprite_position = (sprite_position[0], sprite_position[1] + 5)
     #Sprite change test
-    elif keys[pygame.K_q]:
+    if keys[pygame.K_q]:
         sprite_image = pygame.image.load('resources/CollisionTesterJerry.png')
         sprite_rect = sprite_image.get_rect()
         sprite_position = sprite_rect.center
