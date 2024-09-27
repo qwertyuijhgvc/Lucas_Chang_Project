@@ -111,7 +111,7 @@ class Enemy_Hero(pygame.sprite.Sprite):
         self.image = enemy_hero_image
         self.level = 1
         self.hp = 10
-        self.atk = 5
+        self.atk = 1
         self.rect = self.image.get_rect()
         self.rect.x = 300
         self.rect.y = 300
@@ -122,6 +122,7 @@ class Enemy_Hero(pygame.sprite.Sprite):
         self.stun_timer = 0
         self.poison_timer = -1
         self.knockback_timer = 0
+        self.player_HP = 5
     # end constructor
     def level_up(self):
         self.level += 1
@@ -156,6 +157,8 @@ class Enemy_Hero(pygame.sprite.Sprite):
     def get_rect_y(self):
         return self.rect.y
     #end function
+    def get_player_HP(self):
+        return self.player_HP
     def stun(self):
         #self.image = stun.image
         self.stun_timer = 120
@@ -196,6 +199,7 @@ class Enemy_Hero(pygame.sprite.Sprite):
             #self.image = attack.image
             self.rect.x += -self.speed * distance_x / distance
             self.rect.y += -self.speed * distance_y / distance
+            self.player_HP -= self.atk
             self.knockback(60)
     #end procedure
     
@@ -205,9 +209,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, sprite_image):
         self.image = sprite_image
         self.HP = 100
-        
-
-
+#end class
 #Projectile fire
 def projectile_fire(type):
     mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -349,11 +351,15 @@ while running:
         #reset pos
         sprite_position = (100,100)
         # positions
+    #end if
+    if Jerry.get_player_HP() == 0:
+        screen.fill(WHITE)
+        draw_text(str("YOU LOSE"), finish_font, BLACK, 300, 250)
+    #end if       
     # Update display
     pygame.display.flip()
     # Cap the frame rate
     pygame.time.Clock().tick(60)
-
     # Increase cooldown value
     Jerry.set_cooldown(Jerry.get_cooldown() + 1)
 
