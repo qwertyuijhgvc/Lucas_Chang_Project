@@ -38,7 +38,11 @@ enemy_hero_image = pygame.image.load("resources/CollisionTesterJerry.png").conve
 rescale_size = (100,100)
 enemy_hero_image = pygame.transform.scale(enemy_hero_image, rescale_size)
 #Variables
-pause = False
+pause = True
+levelSelect = False
+bossSelect = False
+controlScreen = False
+playerBoss = ""
 #test variables
 hit = 0
 dodge_times = 0
@@ -82,6 +86,11 @@ class Projectile(pygame.sprite.Sprite):
             self.rect = self.image.get_rect(center=position)
             self.speed = 5
             self.cooldown = -240
+        elif self.type == "bubble":
+            #self.image = bubble_projectile.image
+            self.rect = self.image.get_rect(center=position)
+            self.speed = 0
+            self.cooldown = -100
         #end if
         self.angle = angle
     # end constructor function
@@ -136,6 +145,23 @@ class Enemy_Hero(pygame.sprite.Sprite):
         self.stun_timer = 0
         self.poison_timer = -1
         self.knockback_timer = 0
+    #end procedure
+    def set_speed(self,speed):
+        self.speed = speed
+    #end procedure
+    def set_level(self,level):
+        self.level = level
+        self.speed = 1 + self.old_speed
+        self.old_speed = self.speed
+        self.hp = 10 * self.level
+        self.atk = 5 * self.level
+        self.dodge += 0.2
+        self.rect.x = 700
+        self.rect.y = 500
+        self.stun_timer = 0
+        self.poison_timer = -1
+        self.knockback_timer = 0
+    #end procedure
     def get_cooldown(self):
         return self.projectile_cooldown
     #end function
@@ -228,21 +254,56 @@ all_sprites_list.add(Jerry)
 
 # Create HP bar
 HP_Full(Jerry.get_hp(), HP_Bar_list)
-
+#Create level selection
+def Level_Select(enemyLevel, bossChosen, Enemy):
+    Enemy.set_level(enemyLevel) 
+    #if bossChosen == "Plant":
+        #sprite_image = pygame.image.load('resources/Plant_Boss_Head.png')
+        #Background_image = pygame.image.load('resources/Forest.png')
+        #
+    #end if
+#end procedure
+def toggle(boolean):
+    if boolean == True:
+        return False
+    else:
+        return True
+#end function
 # Main game loop
 running = True
 projectiles = pygame.sprite.Group()
 while running:
-    keys = pygame.key.get_pressed()
-    # Handle events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         # end if
+    #next event
+    #variable for key presses
+    keys = pygame.key.get_pressed()
+    #to pause and unpause the game
+    if keys[pygame.K_ESCAPE]:
+        pause = toggle(pause)
+    #end if
+    #check if game is paused
+    if pause == True:
+        #pause the game
+        screen.fill(WHITE)
+        Jerry.set_speed(0)
+        for projectile in projectiles:
+            projectiles.remove(projectile)
+        #next projectile
+        #check if player is clicking on screen
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
+            #get position of mouse
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+        #end if
+        # Update display
+        pygame.display.flip()
+    else:
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
             cooldown = Jerry.get_cooldown()
             if cooldown > 1:
-                projectile_fire("normal")
+                projectile_fire("bubble")
             #end if
         elif keys[pygame.K_1]:
             cooldown = Jerry.get_cooldown()
@@ -257,111 +318,114 @@ while running:
             if cooldown > 1:
                 projectile_fire("stun")        
         # end if
-    for projectile in projectiles:
-        projectile_hit_list = pygame.sprite.spritecollide(projectile, all_sprites_list, False)
-        for _ in projectile_hit_list:
-            projectiles.remove(projectile)
-            hit += 1
-            dodge_check = random.randrange(0, 100)
-            if dodge_check >= Jerry.get_dodge():
-                if projectile.get_type() == "normal":
-                    Jerry.set_hp(Jerry.get_hp() - 1)
-                elif projectile.get_type() == "heavy": 
-                    Jerry.set_hp(Jerry.get_hp() - 2)
-                    #Jerry knockback
-                    Jerry.knockback(60)
-                elif projectile.get_type() == "poison":
-                    Jerry.poison()
-                elif projectile.get_type() == "stun":
-                    Jerry.stun()
-                #end if
-            else:
-                dodge_times += 1
-        if projectile.get_rect_width() > 800 or projectile.get_rect_height() > 600 or projectile.get_rect_width() < 0 or projectile.get_rect_height() < 0:
-            projectiles.remove(projectile)
-    for sprite in HP_Bar_list:
-        sprite.kill()
-        # next sprite
-    HP_Full(Jerry.get_hp(), HP_Bar_list)
-    mouse_x, mouse_y = pygame.mouse.get_pos()
-
-    # Calculate angle between sprite and mouse
-    if keys[pygame.K_a]:
-        sprite_position = (sprite_position[0] - 5, sprite_position[1])
-    if keys[pygame.K_d]:
-        sprite_position = (sprite_position[0] + 5, sprite_position[1])
-    if keys[pygame.K_w]:
-        sprite_position = (sprite_position[0], sprite_position[1] - 5)
-    if keys[pygame.K_s]:
-        sprite_position = (sprite_position[0], sprite_position[1] + 5)
-    #Sprite change test
-    if keys[pygame.K_q]:
-        sprite_image = pygame.image.load('resources/CollisionTesterJerry.png')
-        sprite_rect = sprite_image.get_rect()
-        sprite_position = sprite_rect.center
-    #end if
-    angle = math.atan2(mouse_y - sprite_position[1], mouse_x - sprite_position[0])
-    angle = math.degrees(angle)
-    rotated_sprite = pygame.transform.rotate(sprite_image, -angle)
-    rotated_rect = rotated_sprite.get_rect(center=sprite_position)
-
-    # Clear screen
-    screen.fill(WHITE)
-    # Draw rotated sprite
-    screen.blit(rotated_sprite, rotated_rect)
-    # Update and draw projectiles
-    for projectile in projectiles:
-        projectile.update()
-        screen.blit(projectile.image, projectile.rect.topleft)
-    # next projectile
-    #update Jerry position to move towards player
-    distance_x = int(sprite_position[0]) - Jerry.get_rect_x()
-    distance_y = int(sprite_position[1]) - Jerry.get_rect_y()
-    Jerry.update(distance_x, distance_y)
-    #update Jerry status effect timers
-    # draw sprites
-    all_sprites_list.draw(screen)
-    HP_Bar_list.draw(screen)
-    # test to check if hit works
-    draw_text(str(hit), text_font, BLACK, 650, 475)
-    # test to check if dodge works
-    draw_text(str(dodge_times), text_font, BLACK, 650, 375)
-    # test to check if cooldown works
-    draw_text(str(Jerry.get_cooldown()), text_font, BLACK, 650, 275)
-    # test to check if hp works
-    draw_text(str(Jerry.get_hp()), text_font, BLACK, 650, 75)
-    # What to do once you beat enemy
-    if Jerry.get_hp() <= 0:
-        # To remove projectiles so they don't stay around next level
+        #if keys[pygame.K_ESCAPE]:
+            #pause = toggle(pause)
         for projectile in projectiles:
-            projectiles.remove(projectile)
-        # next projectile
-        # Next level screen
-        screen.fill(WHITE)
-        draw_text(str("You beat the stage!"), finish_font, BLACK, 200, 250)
-        pygame.display.flip()
-        # give time for player to read
-        pygame.time.delay(600)
-        screen.fill(WHITE)
-        draw_text(str("Next stage"), finish_font, BLACK, 300, 250)
-        pygame.display.flip()
-        pygame.time.delay(600)
-        # Make enemy stronger for next level
-        Jerry.level_up()
-        #reset pos
-        sprite_position = (100,100)
-        # positions
-    #end if
-    if Jerry.get_player_HP() == 0:
-        screen.fill(WHITE)
-        draw_text(str("YOU LOSE"), finish_font, BLACK, 300, 250)
-    #end if       
-    # Update display
-    pygame.display.flip()
-    # Cap the frame rate
-    pygame.time.Clock().tick(60)
-    # Increase cooldown value
-    Jerry.set_cooldown(Jerry.get_cooldown() + 1)
+            projectile_hit_list = pygame.sprite.spritecollide(projectile, all_sprites_list, False)
+            for _ in projectile_hit_list:
+                projectiles.remove(projectile)
+                hit += 1
+                dodge_check = random.randrange(0, 100)
+                if dodge_check >= Jerry.get_dodge():
+                    if projectile.get_type() == "normal" or projectile.get_type() == "bubble":
+                        Jerry.set_hp(Jerry.get_hp() - 1)
+                    elif projectile.get_type() == "heavy": 
+                        Jerry.set_hp(Jerry.get_hp() - 2)
+                        #Jerry knockback
+                        Jerry.knockback(60)
+                    elif projectile.get_type() == "poison":
+                        Jerry.poison()
+                    elif projectile.get_type() == "stun":
+                        Jerry.stun()
+                    #end if
+                else:
+                    dodge_times += 1
+            if projectile.get_rect_width() > 800 or projectile.get_rect_height() > 600 or projectile.get_rect_width() < 0 or projectile.get_rect_height() < 0:
+                projectiles.remove(projectile)
+        for sprite in HP_Bar_list:
+            sprite.kill()
+            # next sprite
+        HP_Full(Jerry.get_hp(), HP_Bar_list)
+        mouse_x, mouse_y = pygame.mouse.get_pos()
 
+        # Calculate angle between sprite and mouse
+        if keys[pygame.K_a]:
+            sprite_position = (sprite_position[0] - 5, sprite_position[1])
+        if keys[pygame.K_d]:
+            sprite_position = (sprite_position[0] + 5, sprite_position[1])
+        if keys[pygame.K_w]:
+            sprite_position = (sprite_position[0], sprite_position[1] - 5)
+        if keys[pygame.K_s]:
+            sprite_position = (sprite_position[0], sprite_position[1] + 5)
+        #Sprite change test
+        if keys[pygame.K_q]:
+            sprite_image = pygame.image.load('resources/CollisionTesterJerry.png')
+            sprite_rect = sprite_image.get_rect()
+            sprite_position = sprite_rect.center
+        #end if
+        angle = math.atan2(mouse_y - sprite_position[1], mouse_x - sprite_position[0])
+        angle = math.degrees(angle)
+        rotated_sprite = pygame.transform.rotate(sprite_image, -angle)
+        rotated_rect = rotated_sprite.get_rect(center=sprite_position)
+
+        # Clear screen
+        screen.fill(WHITE)
+        # Draw rotated sprite
+        screen.blit(rotated_sprite, rotated_rect)
+        # Update and draw projectiles
+        for projectile in projectiles:
+            projectile.update()
+            screen.blit(projectile.image, projectile.rect.topleft)
+        # next projectile
+        #update Jerry position to move towards player
+        distance_x = int(sprite_position[0]) - Jerry.get_rect_x()
+        distance_y = int(sprite_position[1]) - Jerry.get_rect_y()
+        Jerry.update(distance_x, distance_y)
+        #update Jerry status effect timers
+        # draw sprites
+        all_sprites_list.draw(screen)
+        HP_Bar_list.draw(screen)
+        # test to check if hit works
+        draw_text(str(hit), text_font, BLACK, 650, 475)
+        # test to check if dodge works
+        draw_text(str(dodge_times), text_font, BLACK, 650, 375)
+        # test to check if cooldown works
+        draw_text(str(Jerry.get_cooldown()), text_font, BLACK, 650, 275)
+        # test to check if hp works
+        draw_text(str(Jerry.get_hp()), text_font, BLACK, 650, 75)
+        # What to do once you beat enemy
+        if Jerry.get_hp() <= 0:
+            # To remove projectiles so they don't stay around next level
+            for projectile in projectiles:
+                projectiles.remove(projectile)
+            # next projectile
+            # Next level screen
+            screen.fill(WHITE)
+            draw_text(str("You beat the stage!"), finish_font, BLACK, 200, 250)
+            pygame.display.flip()
+            # give time for player to read
+            pygame.time.delay(600)
+            screen.fill(WHITE)
+            draw_text(str("Next stage"), finish_font, BLACK, 300, 250)
+            pygame.display.flip()
+            pygame.time.delay(600)
+            # Make enemy stronger for next level
+            Jerry.level_up()
+            #reset pos
+            sprite_position = (100,100)
+            # positions
+        #end if
+        if Jerry.get_player_HP() == 0:
+            screen.fill(WHITE)
+            draw_text(str("YOU LOSE"), finish_font, BLACK, 300, 250)
+        #end if       
+        # Increase cooldown value
+        Jerry.set_cooldown(Jerry.get_cooldown() + 1)
+        # Update display
+        pygame.display.flip()
+        # Cap the frame rate
+    pygame.time.Clock().tick(60)
+    #end if
+#end while
 # Quit Pygame
 pygame.quit()
