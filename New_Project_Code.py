@@ -279,11 +279,11 @@ while running:
         # end if
     #next event
     #variable for key presses
-    keys = pygame.key.get_pressed()
-    #to pause and unpause the game
-    if keys[pygame.K_ESCAPE]:
-        pause = toggle(pause)
-    #end if
+        keys = pygame.key.get_pressed()
+        #to pause and unpause the game
+        if keys[pygame.K_ESCAPE]:
+            pause = toggle(pause)
+        #end if
     #check if game is paused
     if pause == True:
         #pause the game
@@ -297,6 +297,22 @@ while running:
             #get position of mouse
             mouse_x, mouse_y = pygame.mouse.get_pos()
         #end if
+        #Drawing UI elements on screen
+        pygame.draw.ellipse(screen, BLACK, (50,250,200,100), 3)
+        pygame.draw.ellipse(screen, BLACK, (300,250,200,100), 3)
+        pygame.draw.ellipse(screen, BLACK, (550,250,200,100), 3)
+        #Creating variable for differnet pause screens
+        menu = ""
+        #If statement in order to travel between different menu screens
+        if menu == "Boss Select":
+            screen.fill(WHITE)
+        elif menu == "Controls":
+             screen.fill(WHITE)
+        elif menu == "Controls1":
+            screen.fill(WHITE)
+        elif menu == "Controls2":
+            screen.fill(WHITE)
+        #end if
         # Update display
         pygame.display.flip()
     else:
@@ -305,6 +321,7 @@ while running:
             if cooldown > 1:
                 projectile_fire("bubble")
             #end if
+        #different keys for different types of projectiles
         elif keys[pygame.K_1]:
             cooldown = Jerry.get_cooldown()
             if cooldown > 1:
