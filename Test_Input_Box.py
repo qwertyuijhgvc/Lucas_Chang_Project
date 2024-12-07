@@ -29,6 +29,7 @@ while True:
                   usr_txt = usr_txt[:-1]
             elif event.key == pygame.K_RETURN:
                 usr_txt = ""
+                screen.fill(WHITE)
             else:
                 usr_txt += event.unicode
     # draw rectangle and the argument passed which should be on-screen

@@ -43,6 +43,10 @@ levelSelect = False
 bossSelect = False
 controlScreen = False
 playerBoss = ""
+usr_txt = ""
+menu = ""
+mouse_x = 0
+mouse_y = 0
 #test variables
 hit = 0
 dodge_times = 0
@@ -281,9 +285,34 @@ while running:
     #variable for key presses
         keys = pygame.key.get_pressed()
         #to pause and unpause the game
-        if keys[pygame.K_ESCAPE]:
-            pause = toggle(pause)
+        if menu == "":
+            if keys[pygame.K_ESCAPE]:
+                pause = toggle(pause)
+            #end if
+        else:
+            if keys[pygame.K_ESCAPE]:
+                menu = ""
+            #end if
         #end if
+        #for entering text while in pause screen
+        if pause == True:
+            if event.type == pygame.KEYDOWN:
+                    # Check for backspace
+                if event.key == pygame.K_BACKSPACE:
+                    usr_txt = usr_txt[:-1]
+                elif event.key == pygame.K_RETURN:
+                    try:
+                        Jerry.set_level(int(usr_txt))
+                        usr_txt = ""
+                        screen.fill(WHITE)
+                    except:
+                        usr_txt = ""
+                        screen.fill(WHITE)
+                    #end try
+                else:
+                    usr_txt += event.unicode
+                    #end if
+            #end if
     #check if game is paused
     if pause == True:
         #pause the game
@@ -301,17 +330,30 @@ while running:
         pygame.draw.ellipse(screen, BLACK, (50,250,200,100), 3)
         pygame.draw.ellipse(screen, BLACK, (300,250,200,100), 3)
         pygame.draw.ellipse(screen, BLACK, (550,250,200,100), 3)
+        #drawing text box and user text
+        pygame.draw.rect(screen, BLACK, [70,360,175,50])
+        pygame.draw.rect(screen, WHITE, [80,370,155,30])
+        draw_text(usr_txt, intro_font, BLACK, 100, 375)
         #Creating variable for differnet pause screens
-        menu = ""
+        #If statement to change menu value
+        if menu == "": 
+            if mouse_x > 300 and mouse_x < 500 and mouse_y > 250 and mouse_y < 350:
+                menu = "Boss Select"
+            elif mouse_x > 550 and mouse_x < 650 and mouse_y > 250 and mouse_y < 350:
+                menu = "Controls"
+            #end if
+        #end if
         #If statement in order to travel between different menu screens
+        #remember to add a back button since pressing escape is inconsistent
+        #remeber playerBoss
         if menu == "Boss Select":
             screen.fill(WHITE)
+            pygame.draw.ellipse(screen, BLACK, (50,250,200,100), 3)
+            pygame.draw.ellipse(screen, BLACK, (50,250,200,100), 3)
         elif menu == "Controls":
-             screen.fill(WHITE)
-        elif menu == "Controls1":
             screen.fill(WHITE)
-        elif menu == "Controls2":
-            screen.fill(WHITE)
+            pygame.draw.ellipse(screen, BLACK, (100,250,200,100), 3)
+            pygame.draw.ellipse(screen, BLACK, (500,250,200,100), 3)
         #end if
         # Update display
         pygame.display.flip()
@@ -440,7 +482,7 @@ while running:
         Jerry.set_cooldown(Jerry.get_cooldown() + 1)
         # Update display
         pygame.display.flip()
-        # Cap the frame rate
+    # Cap the frame rate
     pygame.time.Clock().tick(60)
     #end if
 #end while
