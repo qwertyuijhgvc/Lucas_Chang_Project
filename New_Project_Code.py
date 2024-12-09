@@ -31,9 +31,9 @@ sprite_image = pygame.image.load('resources/test_sprite.png')
 sprite_rect = sprite_image.get_rect()
 sprite_position = sprite_rect.center
 #Sprite for projectile
-projectile_image = pygame.image.load('resources/test_projectile.png').convert()
+projectile_image = pygame.image.load('resources/test_projectile.png')
 #sprite for enemy
-enemy_hero_image = pygame.image.load("resources/CollisionTesterJerry.png").convert()
+enemy_hero_image = pygame.image.load("resources/CollisionTesterJerry.png")
 #rescale enemy size
 rescale_size = (100,100)
 enemy_hero_image = pygame.transform.scale(enemy_hero_image, rescale_size)
@@ -47,13 +47,17 @@ usr_txt = ""
 menu = ""
 mouse_x = 0
 mouse_y = 0
+leftClickSymbol = pygame.image.load("resources/left_click.png")
+leftClickSymbol = pygame.transform.scale(leftClickSymbol, (100,100))
 #test variables
 hit = 0
 dodge_times = 0
 Player_HP = 100
 #fonts
-intro_font = pygame.font.SysFont("Arial", 20)
-text_font = pygame.font.SysFont("Arial", 10)
+small_font = pygame.font.SysFont("Arial", 15)
+usr_font = pygame.font.SysFont("Arial", 20)
+text_font = pygame.font.SysFont("Arial", 30)
+menu_font = pygame.font.SysFont("Arial", 60)
 finish_font = pygame.font.SysFont("Arial", 50)
 #creating procedure to write text on screen
 def draw_text(text, font, text_col, x, y):
@@ -219,8 +223,8 @@ class Enemy_Hero(pygame.sprite.Sprite):
             #self.image = knockback.image
             self.speed = self.speed * -1
             self.knockback_timer -= 1 
-        distance = ((distance_x) ** 2 + (distance_y) ** 2) **0.5
         #end if
+        distance = ((distance_x) ** 2 + (distance_y) ** 2) **0.5
         if distance > 10:
             self.rect.x += self.speed * distance_x / distance
             self.rect.y += self.speed * distance_y / distance
@@ -274,6 +278,7 @@ def toggle(boolean):
         return True
 #end function
 # Main game loop
+#menu = "Boss Control 1"
 running = True
 projectiles = pygame.sprite.Group()
 while running:
@@ -296,11 +301,14 @@ while running:
         #end if
         #for entering text while in pause screen
         if pause == True:
+            #check if player is typing
             if event.type == pygame.KEYDOWN:
-                    # Check for backspace
+                # Check for backspace
                 if event.key == pygame.K_BACKSPACE:
                     usr_txt = usr_txt[:-1]
+                #check if player is entering the level
                 elif event.key == pygame.K_RETURN:
+                    #check if player inputted valid input
                     try:
                         Jerry.set_level(int(usr_txt))
                         usr_txt = ""
@@ -309,6 +317,7 @@ while running:
                         usr_txt = ""
                         screen.fill(WHITE)
                     #end try
+                #add the inputted text to a string variable
                 else:
                     usr_txt += event.unicode
                     #end if
@@ -333,7 +342,11 @@ while running:
         #drawing text box and user text
         pygame.draw.rect(screen, BLACK, [70,360,175,50])
         pygame.draw.rect(screen, WHITE, [80,370,155,30])
-        draw_text(usr_txt, intro_font, BLACK, 100, 375)
+        draw_text(usr_txt, usr_font, BLACK, 100, 375)
+        draw_text("Main Menu", menu_font, BLACK, 200, 100)
+        draw_text("Level", text_font, BLACK, 115, 285)
+        draw_text("Boss Select", text_font, BLACK, 320, 285)
+        draw_text("Controls", text_font, BLACK, 590, 285)
         #Creating variable for differnet pause screens
         #If statement to change menu value
         if menu == "": 
@@ -344,20 +357,96 @@ while running:
             #end if
         #end if
         #If statement in order to travel between different menu screens
-        #remember to add a back button since pressing escape is inconsistent
-        #remeber playerBoss
         if menu == "Boss Select":
             screen.fill(WHITE)
-            pygame.draw.ellipse(screen, BLACK, (50,250,200,100), 3)
-            pygame.draw.ellipse(screen, BLACK, (50,250,200,100), 3)
+            pygame.draw.ellipse(screen, BLACK, (100,250,200,100), 3)
+            pygame.draw.ellipse(screen, BLACK, (500,250,200,100), 3)
+            #creates a button to go back to main menu
+            pygame.draw.ellipse(screen, BLACK, (10,10,50,50), 2)
+            draw_text("Back", small_font, BLACK, 20, 25)
+            draw_text("Boss Select", menu_font, BLACK, 225, 100)
+            draw_text("Boss 1", text_font, BLACK, 150, 275)
+            draw_text("Boss 2", text_font, BLACK, 550, 275)
+            if mouse_x > 0 and mouse_x < 60 and mouse_y > 0 and mouse_y < 60:
+                menu = ""
+            elif mouse_x > 100 and mouse_x < 300 and mouse_y > 250 and mouse_y < 350:
+                playerBoss = "Fish Boss"
+                menu = ""
+                toggle(pause)
+            elif mouse_x > 500 and mouse_x < 700 and mouse_y > 250 and mouse_y < 350:
+                playerBoss = "Plant Boss Phase1"
+                menu = ""
+                toggle(pause)
+            #end if
         elif menu == "Controls":
             screen.fill(WHITE)
             pygame.draw.ellipse(screen, BLACK, (100,250,200,100), 3)
             pygame.draw.ellipse(screen, BLACK, (500,250,200,100), 3)
+            #creates a button to go back to main menu
+            pygame.draw.ellipse(screen, BLACK, (10,10,50,50), 2)
+            draw_text("Back", small_font, BLACK, 20, 25)
+            draw_text("Controls", menu_font, BLACK, 275, 100)
+            draw_text("Boss 1", text_font, BLACK, 150, 275)
+            draw_text("Boss 2", text_font, BLACK, 550, 275)
+            if mouse_x > 0 and mouse_x < 60 and mouse_y > 0 and mouse_y < 60:
+                menu = ""
+            elif mouse_x > 100 and mouse_x < 300 and mouse_y > 250 and mouse_y < 350:
+                menu = "Boss Control 1"
+            elif mouse_x > 500 and mouse_x < 700 and mouse_y > 250 and mouse_y < 350:
+                menu = "Boss Control 2"
+            #end if
+        elif menu == "Boss Control 1":
+            screen.fill(WHITE)
+            if mouse_x > 0 and mouse_x < 60 and mouse_y > 0 and mouse_y < 60:
+                menu = ""
+            #end if
+            pygame.draw.ellipse(screen, BLACK, (10,10,50,50), 2)
+            draw_text("Back", small_font, BLACK, 20, 25)
+            bossImagePlant1 = pygame.image.load("resources/Plant_Boss_Phase 1-Idle.png")
+            bossImagePlant1 = pygame.transform.scale(bossImagePlant1, (200,200))
+            bossImagePlant2 = pygame.image.load("resources/Plant_Boss_Phase_2.png")
+            bossImagePlant2 = pygame.transform.scale(bossImagePlant2, (200,200))
+            screen.blit(bossImagePlant1, (50, 100))
+            screen.blit(bossImagePlant2, (450, 100))
+            screen.blit(leftClickSymbol, (-10, 300))
+            draw_text("This attack shoots a fast small seed which deals", small_font, BLACK, 70, 325)
+            draw_text("a little damage", small_font, BLACK, 70, 350)
+            pygame.draw.rect(screen, BLACK, [20,400,50,50])
+            pygame.draw.rect(screen, BLACK, [20,475,50,50])
+            draw_text("1", menu_font, WHITE, 25, 390)
+            draw_text("2", menu_font, WHITE, 25, 465)
+            draw_text("This attack shoots a small yellow seed ", small_font, BLACK, 75, 400)
+            draw_text("which stuns your opponents", small_font, BLACK, 75, 425)
+            draw_text("This phase doesn't have a third attack", small_font, BLACK, 75, 490)
+            draw_text("This attack is similar to the first phase", small_font, BLACK, 450, 325)
+            draw_text("but shoots 3 seeds instead", small_font, BLACK, 450, 350)
+            draw_text("This attack is the same as the first phase", small_font, BLACK, 450, 410)
+            draw_text("This shoots a swarm of flies which deal", small_font, BLACK, 450, 475)
+            draw_text("poison damage to your enemy over time", small_font, BLACK, 450, 500)
+            #img = pygame.image.load("image.png")
+            #screen.blit(img, 0,0)
+        elif menu == "Boss Control 2":
+            screen.fill(WHITE)
         #end if
         # Update display
         pygame.display.flip()
     else:
+        oceanMap = pygame.image.load('resources/Ocean_Map.png')
+        oceanMap = pygame.transform.scale(oceanMap, (800,600))
+        #Changing the player's character depending on which character they chose
+        if playerBoss == "Fish Boss":
+            #Changes player's sprite to match chosen boss
+            sprite_image = pygame.image.load('resources/Fish_Boss.png')
+            #Rescale sprite to fit screen proportions cus actual png of the sprite is too large
+            sprite_image = pygame.transform.scale(sprite_image, (200,75))
+            sprite_rect = sprite_image.get_rect()
+            sprite_position = sprite_rect.center
+            #reset the variable player boss since if not done the program will continue to reload this secton every tick and cause large lag
+            playerBoss = ""
+            #displays the proper background for the boss
+            oceanMap = pygame.image.load('resources/Ocean_Map.png')
+            oceanMap = pygame.transform.scale(oceanMap, (800,600))
+            screen.blit(oceanMap, (0,0))
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
             cooldown = Jerry.get_cooldown()
             if cooldown > 1:
@@ -377,8 +466,6 @@ while running:
             if cooldown > 1:
                 projectile_fire("stun")        
         # end if
-        #if keys[pygame.K_ESCAPE]:
-            #pause = toggle(pause)
         for projectile in projectiles:
             projectile_hit_list = pygame.sprite.spritecollide(projectile, all_sprites_list, False)
             for _ in projectile_hit_list:
@@ -406,7 +493,6 @@ while running:
             # next sprite
         HP_Full(Jerry.get_hp(), HP_Bar_list)
         mouse_x, mouse_y = pygame.mouse.get_pos()
-
         # Calculate angle between sprite and mouse
         if keys[pygame.K_a]:
             sprite_position = (sprite_position[0] - 5, sprite_position[1])
@@ -429,6 +515,7 @@ while running:
 
         # Clear screen
         screen.fill(WHITE)
+        screen.blit(oceanMap, (0,0))
         # Draw rotated sprite
         screen.blit(rotated_sprite, rotated_rect)
         # Update and draw projectiles
@@ -445,13 +532,13 @@ while running:
         all_sprites_list.draw(screen)
         HP_Bar_list.draw(screen)
         # test to check if hit works
-        draw_text(str(hit), text_font, BLACK, 650, 475)
+        #draw_text(str(hit), text_font, BLACK, 650, 475)
         # test to check if dodge works
-        draw_text(str(dodge_times), text_font, BLACK, 650, 375)
+        #draw_text(str(dodge_times), text_font, BLACK, 650, 375)
         # test to check if cooldown works
-        draw_text(str(Jerry.get_cooldown()), text_font, BLACK, 650, 275)
+        #draw_text(str(Jerry.get_cooldown()), text_font, BLACK, 650, 275)
         # test to check if hp works
-        draw_text(str(Jerry.get_hp()), text_font, BLACK, 650, 75)
+        #draw_text(str(Jerry.get_hp()), text_font, BLACK, 650, 75)
         # What to do once you beat enemy
         if Jerry.get_hp() <= 0:
             # To remove projectiles so they don't stay around next level

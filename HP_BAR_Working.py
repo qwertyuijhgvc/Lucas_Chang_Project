@@ -24,7 +24,7 @@ class HP_BAR(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x_cord
         self.rect.y = y_cord
-#HP = 70
+HP = 70
 # Create new HP BAR
 def HP_Full(HP, bar_list):
     for i in range(HP):
@@ -33,26 +33,26 @@ def HP_Full(HP, bar_list):
 
 # Main Program Loop
 
-# done = False
-# clock = pygame.time.Clock()
+done = False
+clock = pygame.time.Clock()
 
-# while not done:
-#     for event in pygame.event.get():
-#         if event.type == pygame.QUIT:
-#             done = True
-#         elif event.type == pygame.MOUSEBUTTONDOWN:
-#             for sprite in HP_Bar_list:
-#                 sprite.kill()
-#             #next sprite
-#             HP = HP - 1
-#         for i in range(HP):
-#             Bar = HP_BAR(i * 10, 100)
-#             HP_Bar_list.add(Bar)
+while not done:
+     for event in pygame.event.get():
+         if event.type == pygame.QUIT:
+             done = True
+         elif event.type == pygame.MOUSEBUTTONDOWN:
+             for sprite in HP_Bar_list:
+                 sprite.kill()
+             #next sprite
+             HP = HP - 1
+         for i in range(HP):
+             Bar = HP_BAR(i * 10, 100)
+             HP_Bar_list.add(Bar)
 
-#     screen.fill(BLACK)
-#     all_sprites_list.draw(screen)
-#     HP_Bar_list.draw(screen)
-#     pygame.display.flip()
-#     clock.tick(60)
+     screen.fill(BLACK)
+     all_sprites_list.draw(screen)
+     HP_Bar_list.draw(screen)
+     pygame.display.flip()
+     clock.tick(60)
 
 # pygame.quit()
