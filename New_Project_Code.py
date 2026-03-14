@@ -310,9 +310,16 @@ while running:
                 elif event.key == pygame.K_RETURN:
                     #check if player inputted valid input
                     try:
-                        Jerry.set_level(int(usr_txt))
-                        usr_txt = ""
-                        screen.fill(WHITE)
+                        #make sure there is a cap to the level the player can set the enemy to
+                        if 0 < int(usr_txt) < 100:
+                            Jerry.set_level(int(usr_txt))
+                            usr_txt = ""
+                            screen.fill(WHITE)
+                        else:
+                            Jerry.set_level(100)
+                            usr_txt = ""
+                            screen.fill(WHITE)
+                        #end if
                     except:
                         usr_txt = ""
                         screen.fill(WHITE)
@@ -474,7 +481,7 @@ while running:
                 dodge_check = random.randrange(0, 100)
                 if dodge_check >= Jerry.get_dodge():
                     if projectile.get_type() == "normal" or projectile.get_type() == "bubble":
-                        Jerry.set_hp(Jerry.get_hp() - 1)
+                        Jerry.set_hp(Jerry.get_hp() - 10)
                     elif projectile.get_type() == "heavy": 
                         Jerry.set_hp(Jerry.get_hp() - 2)
                         #Jerry knockback
@@ -494,13 +501,13 @@ while running:
         HP_Full(Jerry.get_hp(), HP_Bar_list)
         mouse_x, mouse_y = pygame.mouse.get_pos()
         # Calculate angle between sprite and mouse
-        if keys[pygame.K_a]:
+        if keys[pygame.K_a] and sprite_position[0] > 50:
             sprite_position = (sprite_position[0] - 5, sprite_position[1])
-        if keys[pygame.K_d]:
+        if keys[pygame.K_d] and sprite_position[0] < 750:
             sprite_position = (sprite_position[0] + 5, sprite_position[1])
-        if keys[pygame.K_w]:
+        if keys[pygame.K_w] and sprite_position[1] > 50:
             sprite_position = (sprite_position[0], sprite_position[1] - 5)
-        if keys[pygame.K_s]:
+        if keys[pygame.K_s] and sprite_position[1] < 550:
             sprite_position = (sprite_position[0], sprite_position[1] + 5)
         #Sprite change test
         if keys[pygame.K_q]:
